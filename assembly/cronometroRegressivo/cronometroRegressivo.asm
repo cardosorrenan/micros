@@ -68,39 +68,99 @@
 
 i EQU 0
 j EQU 1
-sw_add
-sw_start
-#define _XTAL_FREQ 4000000  
+k EQU 2
+contador EQU 3
  
 RES_VECT  CODE    0x0000           
     GOTO    START               
-
-START
-    nop
-    MOVLW b'00000011'
-    MOVWF PORTC
-    CLRF TRISB
-    CLRF PORTB
    
-
-LOOP   
-    CALL SELECT_TIME
+START
+    NOP
+    MOVLW b'00000011'
+    MOVWF TRISD   
+    MOVLW b'00000000' 
+    MOVWF TRISB
+    MOVLW b'01100000' ; inicia contagem em 60 minutos
+    MOVWF PORTB
+   
+; Loop principal do programa
+LOOP
+    BTFSC PORTD,0	; botao responsável por definir o tempo de contagem
+    CALL INCREASE_10
+    BTFSC PORTD,1	; botao responsável por iniciar a contagem
+    CALL START_COUNT   
     BRA LOOP
-    
-SELECT_TIME
-    ; se botao 1 acionado
-    BT
-    ; se botao 2 acionado
+
+; Decrementa 10 minutos, -1 na casa das dezenas. 
+;   Para realizar a subtraçao, os nibbles são trocados, pois o valor que queremos 
+; decrementar são os mais significativos.
+INCREASE_10
+    SWAPF PORTB
+    DECF PORTB
+    SWAPF PORTB
+    CALL FIT_MSB_REG_CRO
+; volta ao programa principal somente quando o botão for despressionado
+LOCK 
+    BTFSC PORTD,0
+    BRA LOCK
     RETURN
     
+; O botão de iniciar a contagem foi pressionado
 START_COUNT
+    MOVLW .60
+    MOVWF contador
     DECF PORTB
-    CALL FIT_LSB
-    CALL FIT_MSB
-    CALL ATRASO
-    BRA START_COUNT
+    CALL FIT_LSB_REG
+    CALL FIT_MSB_REG
+ATRASO_1min ; realiza 60 vezes o atraso de 1 segundo
+    CALL ATRASO_1s
+    BTG PORTD,3
+    DECFSZ contador
+    BRA ATRASO_1min
+    MOVLW .0		; variavel contador de segundos iniciado em 60 chegou em 0
+    CPFSEQ PORTB
+    BRA START_COUNT	 
+    BRA ALARM		
     
-FIT_LSB
+; contagem chegou em 0, dispara o alarme e espera que um botao seja pressionado
+; para reiniciar o cronometro
+ALARM
+    BTFSC PORTD,0
+    BRA RESTART
+    BTFSC PORTD,1
+    BRA RESTART
+    BTG PORTD,2
+    CALL ATRASO_25ms
+    BRA ALARM
+    
+; volta ao programa principal somente quando o botão for despressionado
+RESTART
+    BTFSC PORTD,0
+    BRA RESTART
+    BTFSC PORTD,1
+    BRA RESTART
+    BRA START
+    
+; Faz com que o display das dezenas exiba de 1 à 6.
+;   Se os bits mais significativos chegarem em FF na contagem regressiva do cro-
+;  nometro, ou seja, quando houve o estouro, será desviado para o valor 6.
+FIT_MSB_REG_CRO
+    BTFSC PORTB,7
+    RETURN
+    BTFSC PORTB,6
+    RETURN
+    BTFSC PORTB,5
+    RETURN
+    BTFSC PORTB,4
+    RETURN
+    BSF PORTB,6
+    BSF PORTB,5
+    RETURN
+
+; Faz com que o display das unidades exiba de 0 à 9.
+;   Se os bits menos significativos chegarem em FF na contagem regressiva, ou 
+; seja, quando houve o estouro, o valor será desviado para 9.
+FIT_LSB_REG
     BTFSS PORTB,3
     RETURN
     BTFSS PORTB,2
@@ -111,8 +171,11 @@ FIT_LSB
     BCF PORTB,2
     BCF PORTB,1
     RETURN
-    
-FIT_MSB
+
+; Faz com que o display das dezenas exiba de 0 à 6.
+;   Se os bits mais significativos chegarem em FF na contagem regressiva, ou 
+; seja, quando houve o estouro, o valor será desviado para 6.
+FIT_MSB_REG
     BTFSS PORTB,7
     RETURN
     BTFSS PORTB,6
@@ -126,24 +189,38 @@ FIT_MSB
     BCF PORTB,5
     BSF PORTB,4
     RETURN
-    
-ATRASO
-    MOVLW .100	
+       
+; Atraso de 1ms. 
+ATRASO_1ms
+    MOVLW .30
     MOVWF i
-LOOP_EXT
-    NOP			
-    NOP		
-    MOVLW .100		
-    MOVWF j		
-LOOP_INT
-    NOP			
-    NOP			
-    DECFSZ j		
-    BRA LOOP_INT
+LOOP_1ms
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
     DECFSZ i
-    BRA LOOP_EXT
+    BRA LOOP_1ms
     RETURN
- 
-    GOTO $                         
+    
+; Atraso de 25ms
+ATRASO_25ms
+    MOVLW .25
+    MOVWF j
+LOOP_25ms
+    RCALL ATRASO_1ms
+    DECFSZ j
+    BRA LOOP_25ms
+    RETURN        
 
+; Atraso de 1s
+ATRASO_1s
+    MOVLW .40
+    MOVWF k
+LOOP_1s
+    RCALL ATRASO_25ms
+    DECFSZ k
+    BRA LOOP_1s
+    RETURN        
     END
