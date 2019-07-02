@@ -16,7 +16,9 @@
 
 Desenvolva um projeto no MPLABX para gerar, em três pinos de E/S distintos  do PIC18F4550,  as formas de onda apresentadas na figura a seguir. A constante T é definida pela fórmula: T={ 100.N μs segundos, se N>0 e 100 μs segundos, se N=0, sendo N o último dígito de seu número de matrícula.
 
-![img1](https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/img/ger_onda.png)
+<p align="center">
+    <img src="https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/img/ger_onda.png" width="450">
+</p>
 
 > . / gerarOndas.asm
 
@@ -24,6 +26,8 @@ Desenvolva um projeto no MPLABX para gerar, em três pinos de E/S distintos  do 
 
 Tomando como base o hardware da figura a seguir, desenvolva um cronômetro regressivo de minutos. Esse cronômetro deve iniciar parado e com um valor inicial de contagem de 60 minutos, sendo esta configurável em incrementos de 10 minutos a cada acionamento de um dos botões. Ao iniciar a contagem, pelo acionamento de outro botão, esta não poderá mais ser ajustada e nem parada. Ao término da contagem, um buzzer de alarme deve ser acionado emitindo um beep de duração de 250 milisegundos a cada 1 segundo. Nessa ocasião o alarme será interrompido ao se pressionar qualquer uma das teclas, levando o cronômetro ao seu estado inicial: contagem parada, alarme desativado e contagem inicial de 60 minutos.
 
-![img2](https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/img/cr_regr.png)
+<p align="center">
+    <img src="https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/img/cronos.png" width="450">
+</p>
 
 > . / cronometroRegressivo / cronometroRegressivo.asm
