@@ -1,3 +1,5 @@
-![fluxograma](https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/img/fluxograma.jpg)
----
-![project](https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/img/project.png)
+Diagrama:
+[Estrutura do Código](https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/cronometroRegressivo/img/fluxograma.jpg)
+
+Esquemático:
+![project](https://github.com/cardosorrenan/micros-ufc/blob/master/assembly/cronometroRegressivo/img/project.png)
