@@ -1,7 +1,3 @@
-
-## Descrição
-  O repo contém as atividades e projetos desenvolvidos no decorrer da disciplina **Microcontroladores**, ministrada pelo professor [Marcelo M. S. Souza](https://github.com/mmssouza) em 2019.1.
-  
 ## Instruções para Assembly
 
 ### Manipular bits em registro
